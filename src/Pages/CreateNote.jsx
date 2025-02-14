@@ -2,12 +2,8 @@ import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import CheckSolid from "../assets/check-solid.svg";
 import { syncNotes } from "../syncNotes";
-import {
-  saveNoteLocally,
-  getAllNotes,
-  getUnsyncedNotes,
-  getSyncedNotes,
-} from "../localStorage";
+import { saveNoteLocally } from "../localStorage";
+
 function CreateNote(note) {
   const navigate = useNavigate();
   const [title, setTitle] = createSignal(note.title ? note.title : "");
@@ -15,7 +11,6 @@ function CreateNote(note) {
   const [bgColor, setBgColor] = createSignal(
     note.bgColor ? note.bgColor : "bg-white"
   );
-
   const colors = [
     "bg-red-200",
     "bg-yellow-200",
@@ -34,20 +29,19 @@ function CreateNote(note) {
       bgColor: bgColor(),
     };
     saveNoteLocally(newNote);
-
+    console.log(newNote);
     console.log("Saved note locally:", newNote);
-    getAllNotes();
-    getUnsyncedNotes();
     if (navigator.onLine) {
       await syncNotes();
-      console.log(getSyncedNotes());
-      console.log(getAllNotes());
-      console.log(getUnsyncedNotes());
     }
+    navigate(-1);
   };
 
   return (
-    <div class={`${bgColor()} min-h-screen p-6`}>
+    <div
+      class={`${bgColor()} min-h-screen p-6`}
+      style={{ backgroundColor: bgColor() }}
+    >
       {/* Header Section */}
       <div class="flex justify-between items-center mb-4">
         {/* Back Button */}
@@ -68,7 +62,7 @@ function CreateNote(note) {
       </div>
 
       {/* Note Inputs */}
-      <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md">
+      <div class="max-w-5xl mx-auto mt-6 bg-white p-6 rounded-xl shadow-md">
         <input
           type="text"
           placeholder="Title"
@@ -80,15 +74,19 @@ function CreateNote(note) {
           placeholder="Write your note here..."
           value={content()}
           onInput={(e) => setContent(e.target.value)}
-          class="w-full mt-4 p-2 h-40 border rounded focus:outline-none"
+          class="w-full mt-4 p-2 h-[80%] rounded focus:outline-none"
+          style={{ height: "50vh" }}
         />
 
         {/* Color Selector */}
-        <div class="mt-4 flex gap-3">
+        <div class="mt-4 flex gap-3 justify-end">
           {colors.map((color) => (
             <button
               key={color}
-              onClick={() => setBgColor(color)}
+              onClick={() => {
+                setBgColor(color);
+                console.log(bgColor());
+              }}
               class={`${color} w-10 h-10 flex justify-center items-center rounded-full border-2 ${
                 bgColor() === color ? "border-black" : "border-transparent"
               }`}

@@ -21,6 +21,7 @@
   "dependencies": {
     "@solidjs/router": "^0.15.3",
     "@tailwindcss/vite": "^4.0.6",
+    "@thednp/color-picker": "^2.0.3",
     "dexie": "^4.0.11",
     "solid-app-router": "^0.4.2",
     "solid-js": "^1.9.3",

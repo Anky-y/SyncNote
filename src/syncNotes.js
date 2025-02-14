@@ -1,6 +1,12 @@
 // syncNotes.js
 
-import { getUnsyncedNotes, markNoteAsSynced } from "./localStorage";
+import {
+  deleteNote,
+  deleteNoteFromDeletedNotes,
+  getUnsyncedDeletedNotes,
+  getUnsyncedNotes,
+  markNoteAsSynced,
+} from "./localStorage";
 
 export async function syncNotes() {
   // Check if the user is online
@@ -27,6 +33,21 @@ export async function syncNotes() {
       await markNoteAsSynced(note.id); // Mark as synced in Dexie
     } else {
       console.log(`Failed to sync note with id ${note.id}`);
+    }
+  }
+}
+
+export async function syncDeletedNotes() {
+  const unsyncedDeletions = await getUnsyncedDeletedNotes();
+
+  for (let note of unsyncedDeletions) {
+    const res = await fetch(`http://localhost:5000/notes/${note.id}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      deleteNoteFromDeletedNotes(note);
+      console.log(`Note ${note.id} deleted from server.`);
     }
   }
 }

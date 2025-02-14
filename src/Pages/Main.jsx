@@ -1,29 +1,35 @@
 import styles from ".././App.module.css";
 import Navbar from "../Components/Navbar";
 import Notecard from "../Components/Notecard";
+import { getAllNotes, deleteNote } from "../localStorage";
+import { createSignal, onMount } from "solid-js";
+import { syncDeletedNotes } from "../syncNotes";
 function Main() {
+  const [allNotes, setAllNotes] = createSignal([]);
+
+  onMount(async () => {
+    const notes = await getAllNotes();
+    setAllNotes(notes); // Set the fetched notes to the signal
+  });
+
+  // Function to delete and update UI
+  const handleDelete = async (noteId) => {
+    await deleteNote(noteId);
+    await syncDeletedNotes();
+    setAllNotes(await getAllNotes()); // Re-fetch the notes to update UI
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-green-100 to-green-200 p-6">
       <div className="w-full max-w-6xl mx-auto">
         <Navbar />
         {/* Separator */}
         <div className="my-4 border-t-2 border-green-400"></div>
-
         {/* Notes Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mx-auto max-w-5xl justify-center ">
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
-          <Notecard />
+          <For each={allNotes()}>
+            {(note, index) => <Notecard note={note} onDelete={handleDelete} />}
+          </For>
           {/* Add Note Button */}
         </div>
         <a href="/create-note">

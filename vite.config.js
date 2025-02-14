@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import solidSvg from "vite-plugin-solid-svg";
 
 export default defineConfig({
-  plugins: [solidPlugin(), tailwindcss(), solidSvg(), svgLoader()],
+  plugins: [solidPlugin(), tailwindcss(), solidSvg()],
   server: {
     port: 3000,
   },
