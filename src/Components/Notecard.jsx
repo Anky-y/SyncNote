@@ -1,21 +1,36 @@
+import { Navigate } from "solid-app-router";
 import BinIcon from "../assets/trash-can-regular.svg";
 import { deleteNote, getAllNotes } from "../localStorage";
 import Modal from "./ConfirmationModal";
 import { createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 
 function Notecard(props) {
   const [isModalOpen, setIsModalOpen] = createSignal(false);
+  const navigate = useNavigate();
+
+  const handleDeleteClick = (e) => {
+    e.cancelBubble = true; // Prevent the card click from triggering
+    setIsModalOpen(true);
+  };
+
+  const handleCardClick = (e) => {
+    // Only trigger navigation if the modal isn't open
+    if (!isModalOpen()) {
+      navigate(`/Update-note`, { state: props.note });
+    }
+  };
   return (
     <div
-      className={`${props.note.bgColor} p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all col-span-1`}
+      className={`${props.note.bgColor} p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all col-span-1 cursor-pointer`}
+      on:click={handleCardClick}
     >
       <div className="flex flex-row justify-between">
         <h2 className="text-lg sm:text-xl font-semibold text-green-800">
           {props.note.title}
         </h2>
         <button
-          className="group"
-          onClick={() => setIsModalOpen(true)} // Show modal on click
+          on:click={handleDeleteClick} // Show modal on click
         >
           <BinIcon className="w-5 sm:w-6 h-5 sm:h-6 cursor-pointer group-hover:scale-110 transition-all duration-300" />
         </button>
