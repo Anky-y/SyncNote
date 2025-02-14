@@ -4,7 +4,7 @@ function Login() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
   const [confirmPassword, setConfirmPassword] = createSignal("");
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     if (password() == confirmPassword()) {
       const res = await fetch("http://localhost:5000/auth/register", {
         method: "POST",
@@ -56,7 +56,7 @@ function Login() {
 
         <button
           class="my-4 p-3 w-full bg-green-500 text-white font-semibold rounded-xl shadow-md hover:bg-green-600 transition-all"
-          onclick={handleLogin}
+          onclick={handleRegister}
         >
           Submit
         </button>

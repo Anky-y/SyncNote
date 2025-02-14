@@ -15,11 +15,13 @@
     "postcss": "^8.5.2",
     "tailwindcss": "^4.0.6",
     "vite": "^6.0.0",
-    "vite-plugin-solid": "^2.11.1"
+    "vite-plugin-solid": "^2.11.1",
+    "vite-svg-loader": "^5.1.0"
   },
   "dependencies": {
     "@solidjs/router": "^0.15.3",
     "@tailwindcss/vite": "^4.0.6",
+    "dexie": "^4.0.11",
     "solid-app-router": "^0.4.2",
     "solid-js": "^1.9.3",
     "vite-plugin-solid-svg": "^0.8.1"

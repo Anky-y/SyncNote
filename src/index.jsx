@@ -19,13 +19,4 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
   );
 }
 
-render(
-  () => (
-    <Router>
-        <Route path="/" component={Login} />
-        <Route path="/Register" component={Register} />
-        <Route path="/Main" component={Main} />
-    </Router>
-  ),
-  root
-);
+render(() => <App />, root);
