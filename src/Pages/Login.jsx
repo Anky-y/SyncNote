@@ -1,8 +1,10 @@
-import styles from ".././App.module.css";
 import { createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 function Login() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
+  const navigate = useNavigate();
+
   const handleLogin = async () => {
     const res = await fetch("http://localhost:5000/auth/login", {
       method: "POST",
@@ -15,7 +17,12 @@ function Login() {
     });
     const data = await res.json();
 
-    console.log(data);
+    if (res.ok) {
+      navigate("/Main");
+    } else {
+      console.error("Login failed:", data.message);
+      alert("Login failed: " + (data.message || "Please try again"));
+    }
   };
 
   return (

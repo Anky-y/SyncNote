@@ -63,7 +63,7 @@ function Login() {
 
         <p class="text-center text-green-600">
           Have an account?{" "}
-          <a href="/login" class="text-green-500 font-semibold hover:underline">
+          <a href="/" class="text-green-500 font-semibold hover:underline">
             Login
           </a>
         </p>
