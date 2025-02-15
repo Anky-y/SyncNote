@@ -5,13 +5,78 @@ import Dexie from "dexie";
 // Initialize a Dexie database
 const db = new Dexie("NotesDB");
 db.version(1).stores({
-  notes: "id, title, content, updatedAt, synced, bgColor",
+  notes: "id,userId, title, content, updatedAt, synced, bgColor",
   deletedNotes: "id, title, content, updatedAt, synced, bgColor",
   updateNotes: "id, updatedFields, updatedAt",
+  loggedInUser: "id, username",
+  unsyncedUsernameUpdates: "++id, userId, username, updatedAt",
 });
+
+export async function saveLoggedInUserLocally(user) {
+  await db.loggedInUser.clear();
+  await db.loggedInUser.put({ id: user.id, username: user.username });
+}
+
+export async function getLoggedInUser() {
+  return await db.loggedInUser.toCollection().first();
+}
+
+export async function updateLoggedInUsername(userId, newUsername) {
+  await db.loggedInUser.update(userId, { username: newUsername });
+}
+
+// Function to get unsynced username updates for the logged-in user
+export async function getUnsyncedUsernameUpdates() {
+  const user = await getLoggedInUser();
+  return await db.unsyncedUsernameUpdates
+    .where("userId")
+    .equals(user.id) // Only fetch updates for the logged-in user
+    .last();
+}
+
+// Function to add a username update to unsynced collection
+export async function addUnsyncedUsernameUpdate(newUsername) {
+  const user = await getLoggedInUser();
+  if (!user || !user.id) {
+    console.error("User not found or not logged in.");
+    return;
+  }
+
+  const updatedAt = new Date().toISOString();
+
+  // Get the latest unsynced update for this user
+  const existingUpdate = await db.unsyncedUsernameUpdates
+    .where("userId")
+    .equals(user.id)
+    .first();
+
+  if (existingUpdate) {
+    await db.unsyncedUsernameUpdates.delete(existingUpdate.id);
+  }
+
+  // Insert the new username update
+  const newId = await db.unsyncedUsernameUpdates.put({
+    userId: user.id,
+    username: newUsername,
+    updatedAt,
+  });
+
+  console.log(`✅ New unsynced username update stored (ID: ${newId})`);
+}
+
+// Function to delete a synced username update
+export async function deleteUnsyncedUsernameUpdate(user) {
+  await db.unsyncedUsernameUpdates.where("userId").equals(user.id).delete();
+}
+
+// Function to mark the username update as synced
+export async function markUsernameAsSynced(username) {
+  await deleteUnsyncedUsernameUpdate(username);
+}
 
 // Function to save a note locally
 export async function saveNoteLocally(note) {
+  console.log(note);
   await db.notes.put({ ...note, synced: 0 });
 }
 
@@ -45,8 +110,12 @@ export async function updateNoteLocally(noteId, updatedFields) {
 
 export async function getAllNotes() {
   try {
-    const notes = await db.notes.orderBy("updatedAt").reverse().toArray(); // Get all notes as an array
-    return notes;
+    const user = await getLoggedInUser();
+    const notes = await db.notes
+      .filter((note) => note.userId === user.id) // Filter by userId
+      .reverse()
+      .toArray(); // Get all notes as an array
+    return notes.sort((a, b) => b.updatedAt - a.updatedAt);
   } catch (error) {
     console.error("Error fetching notes:", error);
     return [];
@@ -55,7 +124,8 @@ export async function getAllNotes() {
 
 // Function to get unsynced notes
 export async function getUnsyncedNotes() {
-  return await db.notes.where("synced").equals(0).toArray();
+  const user = await getLoggedInUser();
+  return await db.notes.where({ synced: 0, userId: user.id }).toArray();
 }
 export async function getUnsyncedUpdatedNotes() {
   const test = db.updateNotes.toArray();
@@ -63,11 +133,11 @@ export async function getUnsyncedUpdatedNotes() {
   return await db.updateNotes.toArray();
 }
 export async function getUnsyncedDeletedNotes() {
-  return await db.deletedNotes.where("synced").equals(0).toArray();
+  return await db.deletedNotes.where({ synced: 0, userId: user.id }).toArray();
 }
 
 export async function getSyncedNotes() {
-  return await db.notes.where("synced").equals(1).toArray();
+  return await db.notes.where({ synced: 1, userId: user.id }).toArray();
 }
 
 // Function to mark note as synced

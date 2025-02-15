@@ -15,8 +15,10 @@ function Main() {
   // Function to delete and update UI
   const handleDelete = async (noteId) => {
     await deleteNote(noteId);
-    await syncDeletedNotes();
     setAllNotes(await getAllNotes()); // Re-fetch the notes to update UI
+    if (navigator.onLine) {
+      await syncDeletedNotes();
+    }
   };
 
   return (

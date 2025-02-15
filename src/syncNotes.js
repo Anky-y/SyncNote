@@ -8,6 +8,7 @@ import {
   markNoteAsSynced,
   getUnsyncedUpdatedNotes,
   deleteNoteFromUpdatedNotes,
+  getUnsyncedUsernameUpdates,
 } from "./localStorage";
 
 export async function syncNotes() {
@@ -95,5 +96,43 @@ export async function syncDeletedNotes() {
       deleteNoteFromDeletedNotes(note);
       console.log(`Note ${note.id} deleted from server.`);
     }
+  }
+}
+
+export async function syncUsernameUpdate() {
+  // Check if the user is online
+  if (!navigator.onLine) {
+    console.log("You are offline. Syncing username update is postponed.");
+    return;
+  }
+
+  console.log("Syncing username update to MongoDB...");
+
+  // Get the latest unsynced username update for the logged-in user
+  const unsyncedUsername = await getUnsyncedUsernameUpdates();
+
+  console.log(unsyncedUsername);
+
+  if (!unsyncedUsername) {
+    console.log("No unsynced username update found.");
+    return;
+  }
+
+  const { username } = unsyncedUsername;
+
+  // Send the username update to MongoDB
+  const res = await fetch("http://localhost:5000/user/update", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      newUsername: username,
+      userId: unsyncedUsername.userId,
+    }),
+  });
+
+  if (res.ok) {
+    console.log(`Username update "${username}" synced successfully!`);
+  } else {
+    console.log(`Failed to sync username update "${username}"`);
   }
 }

@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import CheckSolid from "../assets/check-solid.svg";
 import { syncNotes } from "../syncNotes";
-import { saveNoteLocally } from "../localStorage";
+import { saveNoteLocally, getLoggedInUser } from "../localStorage";
 
 function CreateNote(note) {
   const navigate = useNavigate();
@@ -21,8 +21,10 @@ function CreateNote(note) {
   ];
 
   const handleSave = async () => {
+    const user = await getLoggedInUser();
     const newNote = {
       id: note.id || crypto.randomUUID(), // Generate unique ID if not provided
+      userId: user.id,
       title: title(),
       content: content(),
       updatedAt: Date.now(),
