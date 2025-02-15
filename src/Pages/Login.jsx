@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { saveLoggedInUserLocally } from "../localStorage";
+import { saveLoggedInUserLocally } from "../database/userStorage";
 function Login() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
@@ -14,6 +14,7 @@ function Login() {
       body: JSON.stringify({
         username: username(),
         password: password(),
+        sync: true,
       }),
     });
     const data = await res.json();

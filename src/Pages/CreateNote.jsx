@@ -1,8 +1,9 @@
 import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import CheckSolid from "../assets/check-solid.svg";
-import { syncNotes } from "../syncNotes";
-import { saveNoteLocally, getLoggedInUser } from "../localStorage";
+import { syncNotes } from "../database/syncStorage";
+import { getLoggedInUser } from "../database/userStorage";
+import { saveNoteLocally } from "../database/noteStorage";
 
 function CreateNote(note) {
   const navigate = useNavigate();
@@ -33,8 +34,11 @@ function CreateNote(note) {
     saveNoteLocally(newNote);
     console.log(newNote);
     console.log("Saved note locally:", newNote);
-    if (navigator.onLine) {
+
+    if (navigator.onLine && user?.sync) {
       await syncNotes();
+    } else {
+      console.log("Syncing notes is disabled or user is offline.");
     }
     navigate(-1);
   };

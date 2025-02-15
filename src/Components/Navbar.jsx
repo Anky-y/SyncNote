@@ -3,18 +3,20 @@ import { createSignal } from "solid-js";
 import { FiEdit, FiCheck, FiX } from "solid-icons/fi"; // SolidJS compatible icons
 import { AiOutlineUser } from "solid-icons/ai";
 import {
-  addUnsyncedUsernameUpdate,
+  addUnsyncedSyncUpdate,
   getLoggedInUser,
   updateLoggedInUsername,
-} from "../localStorage";
+  updateUserSyncStatus,
+} from "../database/userStorage";
+import { addUnsyncedUsernameUpdate } from "../database/userStorage";
 import { onMount } from "solid-js";
-import { syncUsernameUpdate } from "../syncNotes";
+import { syncSyncStatus, syncUsernameUpdate } from "../database/syncStorage";
 
 function Navbar() {
   const [dropdownOpen, setDropdownOpen] = createSignal(false);
   const [isEditing, setIsEditing] = createSignal(false);
   const [username, setUsername] = createSignal("Your Username"); // Replace with actual username data
-  const [syncEnabled, setSyncEnabled] = createSignal(true); // Default sync state
+  const [syncToggle, setSyncToggle] = createSignal(true); // Default sync state
 
   onMount(async () => {
     const user = await getLoggedInUser();
@@ -26,8 +28,18 @@ function Navbar() {
     updateLoggedInUsername(user.id, username());
     await addUnsyncedUsernameUpdate(username());
     setIsEditing(false);
-    if (navigator.onLine) {
+    if (navigator.onLine && user?.sync) {
       await syncUsernameUpdate();
+    }
+  }
+
+  async function handleSyncUpdate() {
+    setSyncToggle(!syncToggle());
+    const user = await getLoggedInUser();
+    await updateUserSyncStatus(user.id, syncToggle());
+    await addUnsyncedSyncUpdate(syncToggle());
+    if (navigator.onLine) {
+      await syncSyncStatus();
     }
   }
 
@@ -96,24 +108,24 @@ function Navbar() {
                 <input
                   type="checkbox"
                   className="sr-only"
-                  checked={syncEnabled()}
-                  onChange={() => setSyncEnabled(!syncEnabled())}
+                  checked={syncToggle()}
+                  onChange={handleSyncUpdate}
                 />
                 <label className="relative inline-flex cursor-pointer items-center">
                   <input
                     type="checkbox"
                     className="sr-only"
-                    checked={syncEnabled()}
-                    onChange={() => setSyncEnabled(!syncEnabled())}
+                    checked={syncToggle()}
+                    onChange={handleSyncUpdate}
                   />
                   <div
                     className={`w-12 h-6 rounded-full transition-colors duration-300 ${
-                      syncEnabled() ? "bg-green-500" : "bg-gray-300"
+                      syncToggle() ? "bg-green-500" : "bg-gray-300"
                     }`}
                   >
                     <div
                       className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300 ${
-                        syncEnabled() ? "translate-x-7" : "translate-x-1"
+                        syncToggle() ? "translate-x-7" : "translate-x-1"
                       }`}
                     ></div>
                   </div>

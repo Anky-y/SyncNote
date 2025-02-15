@@ -1,15 +1,20 @@
 // syncNotes.js
 
 import {
-  deleteNote,
   deleteNoteFromDeletedNotes,
-  getUnsyncedDeletedNotes,
   getUnsyncedNotes,
   markNoteAsSynced,
   getUnsyncedUpdatedNotes,
   deleteNoteFromUpdatedNotes,
+  getUnsyncedDeletedNotes,
+} from "./noteStorage";
+import {
   getUnsyncedUsernameUpdates,
-} from "./localStorage";
+  deleteUnsyncedUsernameUpdate,
+  getUnsyncedSyncUpdates,
+  deleteUnsyncedSyncUpdate,
+} from "./userStorage";
+
 
 export async function syncNotes() {
   // Check if the user is online
@@ -132,7 +137,39 @@ export async function syncUsernameUpdate() {
 
   if (res.ok) {
     console.log(`Username update "${username}" synced successfully!`);
+    await deleteUnsyncedUsernameUpdate(unsyncedUsername);
   } else {
     console.log(`Failed to sync username update "${username}"`);
+  }
+}
+
+export async function syncSyncStatus() {
+  if (!navigator.onLine) {
+    console.log("You are offline. Syncing sync status is postponed.");
+    return;
+  }
+
+  console.log("Syncing sync status to MongoDB...");
+
+  const unsyncedSync = await getUnsyncedSyncUpdates();
+
+  if (!unsyncedSync) {
+    console.log("No unsynced sync status update found.");
+    return;
+  }
+
+  const { sync, userId } = unsyncedSync;
+
+  const res = await fetch("http://localhost:5000/user/sync-status", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ sync, userId }),
+  });
+
+  if (res.ok) {
+    console.log(`Sync status "${sync}" synced successfully!`);
+    await deleteUnsyncedSyncUpdate(unsyncedSync);
+  } else {
+    console.log(`Failed to sync sync status "${sync}"`);
   }
 }
