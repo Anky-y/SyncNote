@@ -1,5 +1,6 @@
-import { lazy } from "solid-js";
-import { Router, Route } from "@solidjs/router";
+import { lazy, createSignal, onMount } from "solid-js";
+import { Router, Route, Navigate } from "@solidjs/router";
+import { checkAuth } from "./database/userStorage";
 
 const Login = lazy(() => import("./Pages/Login"));
 

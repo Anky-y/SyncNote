@@ -9,8 +9,12 @@ import {
   updateUserSyncStatus,
 } from "../database/userStorage";
 import { addUnsyncedUsernameUpdate } from "../database/userStorage";
-import { onMount } from "solid-js";
-import { syncSyncStatus, syncUsernameUpdate } from "../database/syncStorage";
+import { onMount, onCleanup } from "solid-js";
+import {
+  syncAll,
+  syncSyncStatus,
+  syncUsernameUpdate,
+} from "../database/syncStorage";
 
 function Navbar() {
   const [dropdownOpen, setDropdownOpen] = createSignal(false);
@@ -18,10 +22,23 @@ function Navbar() {
   const [username, setUsername] = createSignal("Your Username"); // Replace with actual username data
   const [syncToggle, setSyncToggle] = createSignal(true); // Default sync state
 
+  const handleClickOutside = (event) => {
+    if (
+      dropdownOpen() &&
+      !event.target.closest(".dropdown-menu") && // Ensure click is outside dropdown
+      !event.target.closest(".user-icon") // Ensure click is outside user icon
+    ) {
+      setDropdownOpen(false);
+    }
+  };
   onMount(async () => {
     const user = await getLoggedInUser();
     setUsername(user.username);
+    setSyncToggle(user.sync);
+
+    document.addEventListener("click", handleClickOutside);
   });
+  onCleanup(() => document.removeEventListener("click", handleClickOutside));
 
   async function handleUsernameUpdate() {
     const user = await getLoggedInUser();
@@ -41,6 +58,10 @@ function Navbar() {
     if (navigator.onLine) {
       await syncSyncStatus();
     }
+
+    if (syncToggle()) {
+      await syncAll();
+    }
   }
 
   return (
@@ -52,7 +73,7 @@ function Navbar() {
       <div className="relative">
         {/* User Icon */}
         <div
-          className="w-10 h-10 bg-yellow-500 text-black flex items-center justify-center rounded-full cursor-pointer"
+          className="w-10 h-10 bg-yellow-500 text-black flex items-center justify-center rounded-full cursor-pointer user-icon"
           onClick={() => setDropdownOpen(!dropdownOpen())}
         >
           <AiOutlineUser size={20} />
@@ -60,7 +81,7 @@ function Navbar() {
 
         {/* Dropdown Menu */}
         {dropdownOpen() && (
-          <div className="absolute right-5 mt-2 w-56 bg-white text-gray-800 shadow-md rounded-lg overflow-hidden p-3 ">
+          <div className="absolute right-5 mt-2 w-56 bg-white text-gray-800 shadow-md rounded-lg overflow-hidden p-3 dropdown-menu">
             {/* Editable Username */}
             <div className="flex items-center justify-between border-b pb-2 mb-2 mx-2">
               {isEditing() ? (
@@ -102,9 +123,9 @@ function Navbar() {
             </div>
 
             {/* Toggle Sync Button */}
-            <div className="flex justify-between items-center px-2 py-2 hover:bg-gray-200 rounded">
+            <div className="flex justify-between items-center px-2 py-2 rounded">
               <span>Online Sync</span>
-              <label className="relative inline-flex cursor-pointer items-center">
+              <label className="relative inline-flex cursor-pointer items-center  ">
                 <input
                   type="checkbox"
                   className="sr-only"
@@ -119,12 +140,14 @@ function Navbar() {
                     onChange={handleSyncUpdate}
                   />
                   <div
-                    className={`w-12 h-6 rounded-full transition-colors duration-300 ${
-                      syncToggle() ? "bg-green-500" : "bg-gray-300"
+                    className={`w-12 h-6 rounded-full transition-colors duration-300  ${
+                      syncToggle()
+                        ? "bg-green-500 hover:bg-green-600 "
+                        : "bg-gray-300  hover:bg-gray-400"
                     }`}
                   >
                     <div
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300 ${
+                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300  ${
                         syncToggle() ? "translate-x-7" : "translate-x-1"
                       }`}
                     ></div>

@@ -14,6 +14,36 @@ export async function getLoggedInUser() {
   return await db.loggedInUser.toCollection().first();
 }
 
+export async function checkAuth() {
+  const token = localStorage.getItem("authToken");
+  console.log(token);
+
+  if (token) {
+    // If offline, assume authentication is valid
+    if (!navigator.onLine) {
+      return true;
+    }
+
+    // If online, verify with backend
+    try {
+      const response = await fetch("http://localhost:5000/auth/verify", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      return false;
+    }
+  }
+}
+
 export async function updateLoggedInUsername(userId, newUsername) {
   await db.loggedInUser.update(userId, {
     username: newUsername,
@@ -68,10 +98,7 @@ export async function updateUserSyncStatus(userId, syncStatus) {
 
 export async function getUnsyncedSyncUpdates() {
   const user = await getLoggedInUser();
-  return await db.unsyncedSyncUpdates
-    .where("userId")
-    .equals(user.id)
-    .last();
+  return await db.unsyncedSyncUpdates.where("userId").equals(user.id).last();
 }
 
 export async function addUnsyncedSyncUpdate(syncStatus) {

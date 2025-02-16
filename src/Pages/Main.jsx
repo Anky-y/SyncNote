@@ -2,18 +2,27 @@ import styles from ".././App.module.css";
 import Navbar from "../Components/Navbar";
 import Notecard from "../Components/Notecard";
 import { getAllNotes, deleteNote } from "../database/noteStorage";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, onCleanup } from "solid-js";
 import {
   syncDeletedNotes,
   syncSyncStatus,
   syncUpdatedNotes,
   syncUsernameUpdate,
+  syncNotes,
+  syncAll,
 } from "../database/syncStorage";
+import { getLoggedInUser, checkAuth } from "../database/userStorage";
+import { useNavigate } from "@solidjs/router";
 function Main() {
   const [allNotes, setAllNotes] = createSignal([]);
   const [syncEnabled, setSyncEnabled] = createSignal(false);
 
+  const navigate = useNavigate();
+
   onMount(async () => {
+    if (!(await checkAuth())) {
+      navigate("/");
+    }
     const notes = await getAllNotes();
     setAllNotes(notes); // Set the fetched notes to the signal
 
@@ -21,10 +30,12 @@ function Main() {
     if (navigator.onLine) {
       await syncSyncStatus();
     }
-
     const user = await getLoggedInUser();
     if (user) {
       setSyncEnabled(user.sync || false); // Default to false if not set
+    }
+    if (navigator.onLine && syncEnabled()) {
+      await syncAll();
     }
 
     // Attach online event listener to sync when user comes online
@@ -38,11 +49,7 @@ function Main() {
   // Function to sync when coming online
   const handleOnlineSync = async () => {
     if (syncEnabled()) {
-      console.log("User is online. Syncing notes...");
-      await syncUnsyncedNotes();
-      await syncUpdatedNotes();
-      await syncDeletedNotes();
-      await syncUsernameUpdate();
+      await syncAll();
       setAllNotes(await getAllNotes()); // Update UI
     } else {
       console.log("User is online, but syncing is disabled.");
@@ -54,6 +61,7 @@ function Main() {
     await deleteNote(noteId);
     setAllNotes(await getAllNotes()); // Re-fetch the notes to update UI
     if (navigator.onLine && syncEnabled()) {
+      console.log("here");
       await syncDeletedNotes();
     }
   };

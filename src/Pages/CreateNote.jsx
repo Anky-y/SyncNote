@@ -1,8 +1,8 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import CheckSolid from "../assets/check-solid.svg";
 import { syncNotes } from "../database/syncStorage";
-import { getLoggedInUser } from "../database/userStorage";
+import { getLoggedInUser, checkAuth } from "../database/userStorage";
 import { saveNoteLocally } from "../database/noteStorage";
 
 function CreateNote(note) {
@@ -20,6 +20,12 @@ function CreateNote(note) {
     "bg-purple-200",
     "bg-pink-200",
   ];
+
+  onMount(async () => {
+    if (!(await checkAuth())) {
+      navigate("/");
+    }
+  });
 
   const handleSave = async () => {
     const user = await getLoggedInUser();

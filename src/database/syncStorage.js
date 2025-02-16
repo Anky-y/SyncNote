@@ -15,7 +15,6 @@ import {
   deleteUnsyncedSyncUpdate,
 } from "./userStorage";
 
-
 export async function syncNotes() {
   // Check if the user is online
   if (!navigator.onLine) {
@@ -91,8 +90,12 @@ export async function syncUpdatedNotes() {
 
 export async function syncDeletedNotes() {
   const unsyncedDeletions = await getUnsyncedDeletedNotes();
+  console.log(unsyncedDeletions);
 
   for (let note of unsyncedDeletions) {
+    console.log(note);
+    deleteNoteFromDeletedNotes(note); // Just remove it locally
+    console.log(`Note ${note.id} was never synced. Deleted locally.`);
     const res = await fetch(`http://localhost:5000/notes/${note.id}`, {
       method: "DELETE",
     });
@@ -172,4 +175,16 @@ export async function syncSyncStatus() {
   } else {
     console.log(`Failed to sync sync status "${sync}"`);
   }
+}
+
+export async function syncAll() {
+  console.log("Starting full sync...");
+
+  await syncNotes();
+  await syncUpdatedNotes();
+  await syncDeletedNotes();
+  await syncUsernameUpdate();
+  await syncSyncStatus();
+
+  console.log("Full sync completed!");
 }

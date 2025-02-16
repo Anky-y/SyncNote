@@ -1,19 +1,25 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import CheckSolid from "../assets/check-solid.svg";
 import { syncUpdatedNotes } from "../database/syncStorage";
 import { updateNoteLocally } from "../database/noteStorage";
 import { useLocation } from "@solidjs/router";
+import { getLoggedInUser, checkAuth } from "../database/userStorage";
 
 function CreateNote() {
+  onMount(async () => {
+    if (!(await checkAuth())) {
+      navigate("/");
+    }
+  });
   const location = useLocation();
   const note = location.state;
 
   const navigate = useNavigate();
-  const [title, setTitle] = createSignal(note.title ? note.title : "");
-  const [content, setContent] = createSignal(note.content ? note.content : "");
+  const [title, setTitle] = createSignal(note?.title ? note.title : "");
+  const [content, setContent] = createSignal(note?.content ? note.content : "");
   const [bgColor, setBgColor] = createSignal(
-    note.bgColor ? note.bgColor : "bg-white"
+    note?.bgColor ? note?.bgColor : "bg-white"
   );
   const colors = [
     "bg-red-200",
@@ -33,7 +39,6 @@ function CreateNote() {
 
     if (Object.keys(updatedFields).length > 0) {
       updatedFields.updatedAt = Date.now(); // Only update timestamp if something changed
-      updatedFields.synced = 3; // Mark as unsynced and Updated
     }
 
     await updateNoteLocally(note.id, updatedFields);

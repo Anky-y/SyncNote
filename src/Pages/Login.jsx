@@ -1,10 +1,16 @@
-import { createSignal } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { saveLoggedInUserLocally } from "../database/userStorage";
-function Login() {
+import { saveLoggedInUserLocally, checkAuth } from "../database/userStorage";
+function Login({ setIsAuthenticated }) {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
   const navigate = useNavigate();
+
+  onMount(async () => {
+    if (await checkAuth()) {
+      navigate("/Main");
+    }
+  });
 
   const handleLogin = async () => {
     const res = await fetch("http://localhost:5000/auth/login", {
@@ -14,7 +20,6 @@ function Login() {
       body: JSON.stringify({
         username: username(),
         password: password(),
-        sync: true,
       }),
     });
     const data = await res.json();
@@ -22,6 +27,8 @@ function Login() {
     await saveLoggedInUserLocally(data.user);
 
     if (res.ok) {
+      localStorage.setItem("authToken", data.token); // Store token for offline use
+      setIsAuthenticated(true);
       navigate("/Main");
     } else {
       console.error("Login failed:", data.message);

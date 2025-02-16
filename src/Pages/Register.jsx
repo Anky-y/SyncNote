@@ -1,13 +1,20 @@
 import { useNavigate } from "@solidjs/router";
 import styles from ".././App.module.css";
-import { createSignal } from "solid-js";
-import { saveLoggedInUserLocally } from "../database/userStorage";
-function Login() {
+import { createSignal, onMount } from "solid-js";
+import { saveLoggedInUserLocally, checkAuth } from "../database/userStorage";
+function Register() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
   const [confirmPassword, setConfirmPassword] = createSignal("");
 
   const navigate = useNavigate();
+
+  onMount(async () => {
+    if (await checkAuth()) {
+      navigate("/Main");
+    }
+  });
+
   const handleRegister = async () => {
     if (password() == confirmPassword()) {
       const res = await fetch("http://localhost:5000/auth/register", {
@@ -17,15 +24,15 @@ function Login() {
         body: JSON.stringify({
           username: username(),
           password: password(),
+          sync: true,
         }),
       });
       const data = await res.json();
 
       console.log(data);
 
-      await saveLoggedInUserLocally(data.user);
-
       if (res.ok) {
+        await saveLoggedInUserLocally(data.user);
         navigate("/Main");
       } else {
         console.error("Login failed:", data.message);
@@ -87,4 +94,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

@@ -17,15 +17,16 @@ export async function updateNoteLocally(noteId, updatedFields) {
       ...existingNote,
       ...updatedFields,
       updatedAt: Date.now(),
-      synced: 3,
     };
 
     await db.notes.put(updatedNote);
-    await db.updateNotes.put({
-      id: noteId,
-      updatedFields,
-      updatedAt: updatedNote.updatedAt,
-    });
+    if (existingNote.synced === 1) {
+      await db.updateNotes.put({
+        id: noteId,
+        updatedFields,
+        updatedAt: updatedNote.updatedAt,
+      });
+    }
     console.log(`Note with ID ${noteId} updated successfully`);
   } catch (error) {
     console.error("Error updating note:", error);
@@ -58,7 +59,10 @@ export async function markNoteAsSynced(noteId) {
 export async function deleteNote(note) {
   try {
     console.log(note);
-    await db.deletedNotes.put({ ...note, synced: 0 });
+    if (note.synced === 1) {
+      console.log("here");
+      await db.deletedNotes.put(note);
+    }
     await db.notes.delete(note.id);
     console.log(`Note with ID ${note.id} deleted successfully`);
   } catch (error) {
@@ -67,7 +71,8 @@ export async function deleteNote(note) {
 }
 
 export async function getUnsyncedDeletedNotes() {
-  return await db.deletedNotes.where({ synced: 0, userId: user.id }).toArray();
+  const user = await getLoggedInUser();
+  return await db.deletedNotes.toArray();
 }
 
 export async function getUnsyncedUpdatedNotes() {
@@ -80,6 +85,7 @@ export async function deleteNoteFromDeletedNotes(note) {
   try {
     console.log(note);
     await db.deletedNotes.delete(note.id);
+    await db.updateNotes.delete(note.id);
     console.log(`Note with ID ${note.id} deleted successfully`);
   } catch (error) {
     console.error("Error deleting note:", error);
@@ -87,7 +93,6 @@ export async function deleteNoteFromDeletedNotes(note) {
 }
 export async function deleteNoteFromUpdatedNotes(noteId) {
   try {
-    console.log(noteId);
     await db.updateNotes.delete(noteId);
     console.log(`Note with ID ${noteId} deleted successfully`);
   } catch (error) {
