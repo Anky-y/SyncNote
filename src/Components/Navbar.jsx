@@ -16,11 +16,15 @@ import {
   syncUsernameUpdate,
 } from "../database/syncStorage";
 
+import { useNavigate } from "@solidjs/router";
+
 function Navbar() {
   const [dropdownOpen, setDropdownOpen] = createSignal(false);
   const [isEditing, setIsEditing] = createSignal(false);
   const [username, setUsername] = createSignal("Your Username"); // Replace with actual username data
   const [syncToggle, setSyncToggle] = createSignal(true); // Default sync state
+
+  const navigate = useNavigate();
 
   const handleClickOutside = (event) => {
     if (
@@ -63,6 +67,27 @@ function Navbar() {
       await syncAll();
     }
   }
+
+  const handleLogout = async () => {
+    // Make POST request to the backend logout route
+    const res = await fetch("http://localhost:5000/auth/logout", {
+      method: "POST",
+      credentials: "include", // Important for cookies
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Clear localStorage (if you are storing tokens or user data there)
+      localStorage.removeItem("authToken");
+
+      // Optionally, redirect to the login page
+      navigate("/");
+    } else {
+      console.error("Logout failed:", data.message);
+      alert("Logout failed: " + (data.message || "Please try again"));
+    }
+  };
 
   return (
     <div className="flex justify-between items-center p-4 ">
@@ -157,7 +182,10 @@ function Navbar() {
             </div>
 
             {/* Logout Button */}
-            <button className="w-full px-2 py-2 text-red-500 hover:bg-gray-200 active:bg-gray-300">
+            <button
+              onclick={handleLogout}
+              className="w-full px-2 py-2 text-red-500 hover:bg-gray-200 active:bg-gray-300"
+            >
               Logout
             </button>
           </div>
