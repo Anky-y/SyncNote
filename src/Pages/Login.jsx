@@ -1,7 +1,7 @@
 import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { saveLoggedInUserLocally, checkAuth } from "../database/userStorage";
-function Login({ setIsAuthenticated }) {
+function Login() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
   const navigate = useNavigate();
@@ -28,7 +28,6 @@ function Login({ setIsAuthenticated }) {
 
     if (res.ok) {
       localStorage.setItem("authToken", data.token); // Store token for offline use
-      setIsAuthenticated(true);
       navigate("/Main");
     } else {
       console.error("Login failed:", data.message);

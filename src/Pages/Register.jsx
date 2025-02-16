@@ -30,9 +30,12 @@ function Register() {
       const data = await res.json();
 
       console.log(data);
-
+      console.log(res);
+      
       if (res.ok) {
         await saveLoggedInUserLocally(data.user);
+        localStorage.setItem("authToken", data.token); // Store token for offline use
+
         navigate("/Main");
       } else {
         console.error("Login failed:", data.message);
