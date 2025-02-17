@@ -16,8 +16,12 @@ function Register() {
   });
 
   const handleRegister = async () => {
+    if (!navigator.onLine) {
+      alert("Needs internet connection to Register");
+      return;
+    }
     if (password() == confirmPassword()) {
-      const res = await fetch("http://localhost:5000/auth/register", {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         credentials: "include", // Important for cookies
         headers: { "Content-Type": "application/json" },

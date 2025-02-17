@@ -14,7 +14,11 @@ function Login() {
   });
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:5000/auth/login", {
+    if (!navigator.onLine) {
+      alert("Needs internet connection to login");
+      return;
+    }
+    const res = await fetch("http://localhost:5000/api/auth/login", {
       method: "POST",
       credentials: "include", // Important for cookies
       headers: { "Content-Type": "application/json" },
@@ -25,9 +29,10 @@ function Login() {
     });
     const data = await res.json();
 
-    await saveLoggedInUserLocally(data.user);
 
+    
     if (res.ok) {
+      await saveLoggedInUserLocally(data.user);
       localStorage.setItem("authToken", data.token); // Store token for offline use
       navigate("/Main");
     } else {

@@ -63,17 +63,49 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Fetch event: serve cached content when available, else fetch from network
 self.addEventListener("fetch", (event) => {
-  console.log("in fetch");
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      if (response) {
-        // Return the cached resource if found
-        return response;
-      }
-      // Otherwise, fetch it from the network
-      return fetch(event.request);
-    })
-  );
+  const { request } = event;
+
+  // // Ignore Vite's timestamped requests (prevent caching issues)
+  // if (request.url.includes("?t=")) {
+  //   return;
+  // }
+
+  // Define URLs or patterns for API calls that should not be cached
+  const isApiRequest = request.url.includes("/api/");
+
+  // Network-first strategy for JavaScript files (to prevent outdated imports)
+  if (request.destination === "script" || request.destination === "worker") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          return response;
+        })
+        .catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  if (isApiRequest) {
+    // For API requests, use network-first strategy
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          return response;
+        })
+        .catch(() => {
+          return new Response(
+            JSON.stringify({ error: "No internet connection" }),
+            { status: 503, headers: { "Content-Type": "application/json" } }
+          );
+        })
+    );
+  } else {
+    // For static assets, use cache-first strategy
+    event.respondWith(
+      caches.match(request).then((response) => {
+        return response || fetch(request);
+      })
+    );
+  }
 });

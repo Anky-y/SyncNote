@@ -72,7 +72,7 @@ function Navbar() {
 
   const handleLogout = async () => {
     // Make POST request to the backend logout route
-    const res = await fetch("http://localhost:5000/auth/logout", {
+    const res = await fetch("http://localhost:5000/api/auth/logout", {
       method: "POST",
       credentials: "include", // Important for cookies
     });

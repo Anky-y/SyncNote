@@ -77,7 +77,7 @@ function Main() {
         {/* Separator */}
         <div className="my-4 border-t-2 border-accent"></div>
         {/* Notes Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mx-auto max-w-5xl justify-center ">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mx-auto max-w-5xl justify-center ">
           <For each={allNotes()}>
             {(note, index) => <Notecard note={note} onDelete={handleDelete} />}
           </For>

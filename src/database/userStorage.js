@@ -26,7 +26,7 @@ export async function checkAuth() {
 
     // If online, verify with backend
     try {
-      const response = await fetch("http://localhost:5000/auth/verify", {
+      const response = await fetch("http://localhost:5000/api/auth/verify", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
         credentials: "include",

@@ -29,7 +29,7 @@ export async function syncNotes() {
 
   // Send unsynced notes to MongoDB
   for (const note of unsyncedNotes) {
-    const res = await fetch("http://localhost:5000/notes/sync", {
+    const res = await fetch("http://localhost:5000/api/notes/sync", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(note),
@@ -72,7 +72,7 @@ export async function syncUpdatedNotes() {
       continue; // Skip empty updates
     }
     console.log("updatedFields:", JSON.stringify(updatedFields, null, 2));
-    const res = await fetch(`http://localhost:5000/notes/${id}`, {
+    const res = await fetch(`http://localhost:5000/api/notes/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updatedFields),
@@ -96,7 +96,7 @@ export async function syncDeletedNotes() {
     console.log(note);
     deleteNoteFromDeletedNotes(note); // Just remove it locally
     console.log(`Note ${note.id} was never synced. Deleted locally.`);
-    const res = await fetch(`http://localhost:5000/notes/${note.id}`, {
+    const res = await fetch(`http://localhost:5000/api/notes/${note.id}`, {
       method: "DELETE",
     });
 
@@ -129,7 +129,7 @@ export async function syncUsernameUpdate() {
   const { username } = unsyncedUsername;
 
   // Send the username update to MongoDB
-  const res = await fetch("http://localhost:5000/user/update", {
+  const res = await fetch("http://localhost:5000/api/user/update", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -163,7 +163,7 @@ export async function syncSyncStatus() {
 
   const { sync, userId } = unsyncedSync;
 
-  const res = await fetch("http://localhost:5000/user/sync-status", {
+  const res = await fetch("http://localhost:5000/api/user/sync-status", {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sync, userId }),
