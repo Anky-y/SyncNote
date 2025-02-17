@@ -2,6 +2,8 @@ import { useNavigate } from "@solidjs/router";
 import styles from ".././App.module.css";
 import { createSignal, onMount } from "solid-js";
 import { saveLoggedInUserLocally, checkAuth } from "../database/userStorage";
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Register() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
