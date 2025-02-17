@@ -26,23 +26,25 @@ function Navbar() {
 
   const navigate = useNavigate();
 
-  const handleClickOutside = (event) => {
-    if (
-      dropdownOpen() &&
-      !event.target.closest(".dropdown-menu") && // Ensure click is outside dropdown
-      !event.target.closest(".user-icon") // Ensure click is outside user icon
-    ) {
-      setDropdownOpen(false);
-    }
-  };
   onMount(async () => {
     const user = await getLoggedInUser();
+    console.log(user);
     setUsername(user.username);
     setSyncToggle(user.sync);
 
     document.addEventListener("click", handleClickOutside);
   });
   onCleanup(() => document.removeEventListener("click", handleClickOutside));
+  const handleClickOutside = (event) => {
+    if (
+      dropdownOpen() &&
+      !event.target.closest(".dropdown-menu") && // Ensure click is outside dropdown
+      !event.target.closest(".user-icon") && // Ensure click is outside user icon
+      !event.target.closest(".edit-icon")
+    ) {
+      setDropdownOpen(false);
+    }
+  };
 
   async function handleUsernameUpdate() {
     const user = await getLoggedInUser();
@@ -91,14 +93,12 @@ function Navbar() {
 
   return (
     <div className="flex justify-between items-center p-4 ">
-      <h1 className="text-3xl sm:text-4xl font-bold text-green-500">
-        SyncNote
-      </h1>
+      <h1 className="text-3xl sm:text-4xl font-bold text-dark">SyncNote</h1>
 
       <div className="relative">
         {/* User Icon */}
         <div
-          className="w-10 h-10 bg-yellow-500 text-black flex items-center justify-center rounded-full cursor-pointer user-icon"
+          className="w-10 h-10 bg-secondary text-black flex items-center justify-center rounded-full cursor-pointer user-icon"
           onClick={() => setDropdownOpen(!dropdownOpen())}
         >
           <AiOutlineUser size={20} />
@@ -106,7 +106,7 @@ function Navbar() {
 
         {/* Dropdown Menu */}
         {dropdownOpen() && (
-          <div className="absolute right-5 mt-2 w-56 bg-white text-gray-800 shadow-md rounded-lg overflow-hidden p-3 dropdown-menu">
+          <div className="absolute right-5 mt-2 w-56 bg-white text-black shadow-md rounded-lg overflow-hidden p-3 dropdown-menu">
             {/* Editable Username */}
             <div className="flex items-center justify-between border-b pb-2 mb-2 mx-2">
               {isEditing() ? (
@@ -139,7 +139,7 @@ function Navbar() {
                   <span>{username()}</span>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="text-gray-600 ml-2"
+                    className="text-gray-600 ml-2 edit-icon"
                   >
                     <FiEdit size={18} /> {/* Edit Button */}
                   </button>
@@ -157,27 +157,19 @@ function Navbar() {
                   checked={syncToggle()}
                   onChange={handleSyncUpdate}
                 />
-                <label className="relative inline-flex cursor-pointer items-center">
-                  <input
-                    type="checkbox"
-                    className="sr-only"
-                    checked={syncToggle()}
-                    onChange={handleSyncUpdate}
-                  />
+                <div
+                  className={`w-12 h-6 rounded-full transition-colors duration-300  ${
+                    syncToggle()
+                      ? "bg-green-500 hover:bg-green-600 "
+                      : "bg-gray-300  hover:bg-gray-400"
+                  }`}
+                >
                   <div
-                    className={`w-12 h-6 rounded-full transition-colors duration-300  ${
-                      syncToggle()
-                        ? "bg-green-500 hover:bg-green-600 "
-                        : "bg-gray-300  hover:bg-gray-400"
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300  ${
+                      syncToggle() ? "translate-x-7" : "translate-x-1"
                     }`}
-                  >
-                    <div
-                      className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300  ${
-                        syncToggle() ? "translate-x-7" : "translate-x-1"
-                      }`}
-                    ></div>
-                  </div>
-                </label>
+                  ></div>
+                </div>
               </label>
             </div>
 

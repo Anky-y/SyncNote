@@ -7,6 +7,7 @@ function Login() {
   const navigate = useNavigate();
 
   onMount(async () => {
+    console.log("mounted");
     if (await checkAuth()) {
       navigate("/Main");
     }
@@ -36,8 +37,8 @@ function Login() {
   };
 
   return (
-    <div class="flex flex-col justify-center items-center min-h-screen p-6 w-full bg-gradient-to-r from-green-200 to-green-300">
-      <h1 class="text-5xl sm:text-6xl md:text-7xl font-semibold text-green-800 mb-8">
+    <div class="flex flex-col justify-center items-center min-h-screen p-6 w-full bg-background">
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-semibold text-dark mb-8">
         SyncNote
       </h1>
 
@@ -45,7 +46,7 @@ function Login() {
         <input
           type="text"
           placeholder="Username"
-          class="my-3 p-4 w-full rounded-xl border-2 border-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
+          class="my-3 p-4 w-full rounded-xl border-2 border-input-border focus:outline-none focus:ring-2 focus:ring-input-focus-border focus:border-none transition-all"
           value={username()}
           onInput={(e) => setUsername(e.target.value)}
         />
@@ -53,23 +54,23 @@ function Login() {
         <input
           type="password"
           placeholder="Password"
-          class="my-3 p-4 w-full rounded-xl border-2 border-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
+          class="my-3 p-4 w-full rounded-xl border-2 border-input-border focus:outline-none focus:ring-2 focus:ring-input-focus-border focus:border-none transition-all"
           value={password()}
           onInput={(e) => setPassword(e.target.value)}
         />
 
         <button
-          class="my-4 p-3 w-full bg-green-500 text-white font-semibold rounded-xl shadow-md hover:bg-green-600 transition-all"
+          class="my-4 p-3 w-full bg-button-background text-dark font-semibold rounded-xl shadow-md hover:bg-link-hover transition-all cursor-pointer"
           onclick={handleLogin}
         >
           Login
         </button>
 
-        <p class="text-center text-green-600">
+        <p class="text-center text-dark">
           Don't have an account?{" "}
           <a
             href="/register"
-            class="text-green-500 font-semibold hover:underline"
+            class="text-primary font-semibold hover:underline"
           >
             Create one
           </a>

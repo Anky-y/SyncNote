@@ -1,15 +1,43 @@
 @import "tailwindcss";
+@theme {
+  /* Primary Colors */
+  --color-primary: #d18567; /* Soft Coral */
+  --color-secondary: #a8b858; /* Olive Green */
+  --color-accent: #e7cfc3; /* Light Peach */
+  --color-dark: #674f32; /* Dark Brown */
+  --color-light: #dca58a; /* Warm Beige */
+
+  /* Functional Colors */
+  --color-background: var(--color-light);
+  --color-text: var(--color-dark);
+  --color-button-background: var(--color-primary);
+  --color-button-text: #ffffff; /* White */
+  --color-link: var(--color-primary);
+  --color-link-hover: #b56a50; /* Darker Coral */
+  --color-divider: var(--color-accent);
+  --color-input-background: #ffffff; /* White */
+  --color-input-border: var(--color-secondary);
+  --color-input-focus-border: var(--color-primary);
+  --color-input-text: var(--color-dark);
+  --color-input-placeholder: #a0a0a0; /* Gray */
+  --color-modal-background: #ffffff; /* White */
+  --color-modal-overlay: rgba(0, 0, 0, 0.5); /* Semi-transparent Black */
+  --color-modal-close: var(--color-primary);
+  --color-modal-close-hover: #b56a50; /* Darker Coral */
+  --color-cancel: var(--color-accent);
+  --color-cancel-hover: #c4b0a8; /* Muted Peach */
+}
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }

@@ -31,7 +31,7 @@ function Register() {
 
       console.log(data);
       console.log(res);
-      
+
       if (res.ok) {
         await saveLoggedInUserLocally(data.user);
         localStorage.setItem("authToken", data.token); // Store token for offline use
@@ -49,8 +49,8 @@ function Register() {
   };
 
   return (
-    <div class="flex flex-col justify-center items-center min-h-screen w-full p-6 bg-gradient-to-r from-green-200 to-green-300">
-      <h1 class="text-5xl sm:text-6xl md:text-7xl font-semibold text-green-800 mb-8">
+    <div class="flex flex-col justify-center items-center min-h-screen w-full p-6 bg-background">
+      <h1 class="text-5xl sm:text-6xl md:text-7xl font-semibold text-dark mb-8">
         SyncNote
       </h1>
 
@@ -58,7 +58,7 @@ function Register() {
         <input
           type="text"
           placeholder="Username"
-          class="my-3 p-4 w-full rounded-xl border-2 border-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
+          class="my-3 p-4 w-full rounded-xl border-2 border-input-border focus:outline-none focus:ring-2 focus:ring-input-focus-border focus:border-none transition-all"
           value={username()}
           onInput={(e) => setUsername(e.target.value)}
         />
@@ -66,7 +66,7 @@ function Register() {
         <input
           type="password"
           placeholder="Password"
-          class="my-3 p-4 w-full rounded-xl border-2 border-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
+          class="my-3 p-4 w-full rounded-xl border-2 border-input-border focus:outline-none focus:ring-2 focus:ring-input-focus-border focus:border-none  transition-all"
           value={password()}
           onInput={(e) => setPassword(e.target.value)}
         />
@@ -74,21 +74,21 @@ function Register() {
         <input
           type="password"
           placeholder="Confirm Password"
-          class="my-3 p-4 w-full rounded-xl border-2 border-green-300 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
+          class="my-3 p-4 w-full rounded-xl border-2 border-input-border focus:outline-none focus:ring-2 focus:ring-input-focus-border focus:border-none  transition-all"
           value={confirmPassword()}
           onInput={(e) => setConfirmPassword(e.target.value)}
         />
 
         <button
-          class="my-4 p-3 w-full bg-green-500 text-white font-semibold rounded-xl shadow-md hover:bg-green-600 transition-all"
+          class="my-4 p-3 w-full bg-button-background text-dark font-semibold rounded-xl shadow-md hover:bg-link-hover transition-all cursor-pointer"
           onclick={handleRegister}
         >
           Submit
         </button>
 
-        <p class="text-center text-green-600">
+        <p class="text-center text-dark">
           Have an account?{" "}
-          <a href="/" class="text-green-500 font-semibold hover:underline">
+          <a href="/" class="text-primary font-semibold hover:underline">
             Login
           </a>
         </p>
