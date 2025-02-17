@@ -77,10 +77,19 @@ function Main() {
         {/* Separator */}
         <div className="my-4 border-t-2 border-accent"></div>
         {/* Notes Section */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mx-auto max-w-5xl justify-center ">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-4 gap-4 sm:gap-6 mx-auto max-w-5xl justify-center  grid-flow-row-dense">
           <For each={allNotes()}>
-            {(note, index) => <Notecard note={note} onDelete={handleDelete} />}
+            {(note, index) => (
+              <div
+                className={`col-span-1 ${
+                  index() % 2 === 0 ? "sm:col-span-2 " : ""
+                }`}
+              >
+                <Notecard note={note} onDelete={handleDelete} />
+              </div>
+            )}
           </For>
+
           {/* Add Note Button */}
         </div>
         <a href="/create-note">
