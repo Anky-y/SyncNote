@@ -27,3 +27,50 @@ gitignore
 # System Files
 .DS_Store
 Thumbs.db
+
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Build outputs
+dist/
+.vite/
+.vercel/
+.netlify/
+out/
+
+# Logs & caches
+logs/
+*.log
+.cache/
+.tmp/
+
+# Editor & system files
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# TypeScript & testing
+*.tsbuildinfo
+coverage/
+jest/
+cypress/
+playwright/
+
+# Vite-specific
+.vite/
+*.local
+*.cache/
+public/*.map

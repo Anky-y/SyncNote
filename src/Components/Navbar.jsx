@@ -1,4 +1,5 @@
 import UserIcon from "../assets/user-regular.svg";
+const API_URL = import.meta.env.VITE_API_URL;
 import { createSignal } from "solid-js";
 import { FiEdit, FiCheck, FiX } from "solid-icons/fi"; // SolidJS compatible icons
 import { AiOutlineUser } from "solid-icons/ai";
@@ -72,7 +73,7 @@ function Navbar() {
 
   const handleLogout = async () => {
     // Make POST request to the backend logout route
-    const res = await fetch("http://localhost:5000/api/auth/logout", {
+    const res = await fetch(`${API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: "include", // Important for cookies
     });

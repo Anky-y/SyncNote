@@ -13,6 +13,8 @@ import {
 } from "../database/syncStorage";
 import { getLoggedInUser, checkAuth } from "../database/userStorage";
 import { useNavigate } from "@solidjs/router";
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Main() {
   const [allNotes, setAllNotes] = createSignal([]);
   const [syncEnabled, setSyncEnabled] = createSignal(false);

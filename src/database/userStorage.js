@@ -1,4 +1,5 @@
 import db from "./localStorage";
+const API_URL = import.meta.env.VITE_API_URL;
 
 // authStorage.js - Handles user authentication storage
 export async function saveLoggedInUserLocally(user) {
@@ -26,7 +27,7 @@ export async function checkAuth() {
 
     // If online, verify with backend
     try {
-      const response = await fetch("http://localhost:5000/api/auth/verify", {
+      const response = await fetch(`${API_URL}/api/auth/verify`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
         credentials: "include",

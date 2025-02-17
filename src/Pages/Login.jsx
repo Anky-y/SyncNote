@@ -1,6 +1,8 @@
 import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { saveLoggedInUserLocally, checkAuth } from "../database/userStorage";
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Login() {
   const [username, setUsername] = createSignal("");
   const [password, setPassword] = createSignal("");
@@ -18,7 +20,7 @@ function Login() {
       alert("Needs internet connection to login");
       return;
     }
-    const res = await fetch("http://localhost:5000/api/auth/login", {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       credentials: "include", // Important for cookies
       headers: { "Content-Type": "application/json" },
@@ -29,8 +31,6 @@ function Login() {
     });
     const data = await res.json();
 
-
-    
     if (res.ok) {
       await saveLoggedInUserLocally(data.user);
       localStorage.setItem("authToken", data.token); // Store token for offline use
