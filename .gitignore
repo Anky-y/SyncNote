@@ -74,3 +74,5 @@ playwright/
 *.local
 *.cache/
 public/*.map
+
+.vercel
