@@ -48,6 +48,10 @@ function Main() {
 
   // Function to sync when coming online
   const handleOnlineSync = async () => {
+    const user = await getLoggedInUser();
+    if (user) {
+      setSyncEnabled(user.sync || false); // Default to false if not set
+    }
     if (syncEnabled()) {
       await syncAll();
       setAllNotes(await getAllNotes()); // Update UI
