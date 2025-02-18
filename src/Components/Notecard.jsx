@@ -21,7 +21,7 @@ function Notecard(props) {
   };
   return (
     <div
-      className={`${props.note.bgColor} p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all col-span-1 cursor-pointer flex flex-col`}
+      className={`${props.note.bgColor} p-3 sm:p-4 rounded-xl shadow-md hover:shadow-lg transition-all col-span-1 cursor-pointer flex flex-col  h-full`}
       on:click={handleCardClick}
     >
       <div className="flex flex-row justify-between">
