@@ -22,9 +22,9 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker
     .register("/service-worker.js")
-    .then((registration) => {
-      console.log("Service Worker Registered");
-    });
+    .then(() => console.log("Service Worker Registered"))
+    .catch((error) =>
+      console.error("Service Worker Registration Failed:", error)
+    );
 }
-
 render(() => <App />, root);

@@ -6,9 +6,6 @@ import { createSignal, onMount, onCleanup } from "solid-js";
 import {
   syncDeletedNotes,
   syncSyncStatus,
-  syncUpdatedNotes,
-  syncUsernameUpdate,
-  syncNotes,
   syncAll,
 } from "../database/syncStorage";
 import { getLoggedInUser, checkAuth } from "../database/userStorage";
@@ -25,9 +22,6 @@ function Main() {
     if (!(await checkAuth())) {
       navigate("/");
     }
-    const notes = await getAllNotes();
-    setAllNotes(notes); // Set the fetched notes to the signal
-
     // check if syncing is enabled
     if (navigator.onLine) {
       await syncSyncStatus();
@@ -37,8 +31,11 @@ function Main() {
       setSyncEnabled(user.sync || false); // Default to false if not set
     }
     if (navigator.onLine && syncEnabled()) {
+      console.log("BEFORE SYNCALL");
       await syncAll();
     }
+    const notes = await getAllNotes();
+    setAllNotes(notes); // Set the fetched notes to the signal
 
     // Attach online event listener to sync when user comes online
     window.addEventListener("online", handleOnlineSync);

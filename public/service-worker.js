@@ -1,111 +1,95 @@
-// Name your cache (update the version as needed)
-const CACHE_NAME = "syncnote-cache-v1";
+const CACHE_NAME = "syncnote-cache-v1"; // Update version when making changes
 
-// List of URLs to cache
+// List of files to cache
 const FILES_TO_CACHE = [
-  "/", // root (index.html)
-  "/index.html", // main HTML file
-  "/manifest.json", // web app manifest (create if not present)
-  "/src/Pages/Main.jsx",
-  "/src/index.jsx", // main entry point for your app
-  "/src/assets/favicon.ico", // favicon used in index.html
-  "/src/assets/icon-192x192.jpg", // icon used in index.html
-  "/src/assets/icon-512x512.png", // icon used in index.html
-  "/src/assets/icon-regular.png",
-  "/service-worker.js",
-  "/src/assets/check-solid.svg",
-  "/src/assets/trash-can-regular.svg",
-  "/src/assets/user-regular.svg",
-  "/src/Components/confirmationModal.jsx",
-  "/src/Components/Navbar.jsx",
-  "/src/Components/Notecard.jsx",
-  "/src/Database/localStorage.js",
-  "/src/Database/noteStorage.js",
-  "/src/Database/syncStorage.js",
-  "/src/Database/userStorage.js",
-  "/src/Pages/CreateNote.jsx",
-  "/src/Pages/Login.jsx",
-  "/src/Pages/register.jsx",
-  "/src/Pages/UpdateNote.jsx",
-  "/src/App.jsx",
-  "/src/App.module.css",
-  "/src/index.css",
-  "/src/logo.svg",
+  "/", // Main page
+  "/index.html",
+  "/manifest.json",
+  "/service-worker.js", // Service worker itself
+  "/assets/icon-192x192.jpg",
+  "/assets/icon-512x512.png",
+  "/assets/icon-regular.png",
+  "/assets/check-solid.svg",
+  "/assets/trash-can-regular.svg",
+  "/assets/user-regular.svg",
+  "/assets/logo.svg",
+
+  // CSS & JS files
+  "/index.css",
+  "/App.module.css",
+  "/index.js",
+  "/App.js",
+
+  // Components
+  "/Components/confirmationModal.js",
+  "/Components/Navbar.js",
+  "/Components/Notecard.js",
+
+  // Pages
+  "/Pages/CreateNote.js",
+  "/Pages/Login.js",
+  "/Pages/Main.js",
+  "/Pages/Register.js",
+  "/Pages/UpdateNote.js",
 ];
 
-// Install event: pre-cache app shell resources
+/**
+ * Install event - Cache all files
+ */
 self.addEventListener("install", (event) => {
-  console.log("[Service Worker] Installing Service Worker...", event);
+  console.log("[Service Worker] Installing...");
+
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("[Service Worker] Pre-caching offline resources");
+      console.log("[Service Worker] Caching files...");
       return cache.addAll(FILES_TO_CACHE);
     })
   );
-  self.skipWaiting();
+
+  self.skipWaiting(); // Immediately activate new service worker
 });
 
-// Activate event: clean up old caches
+/**
+ * Activate event - Clean old caches
+ */
 self.addEventListener("activate", (event) => {
-  console.log("[Service Worker] Activating Service Worker...", event);
+  console.log("[Service Worker] Activating...");
+
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log("[Service Worker] Removing old cache", key);
+            console.log("[Service Worker] Removing old cache:", key);
             return caches.delete(key);
           }
         })
       );
     })
   );
-  self.clients.claim();
+
+  self.clients.claim(); // Take control of all open pages
 });
 
+/**
+ * Fetch event - Serve from cache first, then update
+ */
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
+  event.respondWith(
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
 
-  // // Ignore Vite's timestamped requests (prevent caching issues)
-  // if (request.url.includes("?t=")) {
-  //   return;
-  // }
-
-  // Define URLs or patterns for API calls that should not be cached
-  const isApiRequest = request.url.includes("/api/");
-
-  // Network-first strategy for JavaScript files (to prevent outdated imports)
-  if (request.destination === "script" || request.destination === "worker") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          return response;
-        })
-        .catch(() => caches.match(request))
-    );
-    return;
-  }
-
-  if (isApiRequest) {
-    // For API requests, use network-first strategy
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          return response;
-        })
-        .catch(() => {
-          return new Response(
-            JSON.stringify({ error: "No internet connection" }),
-            { status: 503, headers: { "Content-Type": "application/json" } }
-          );
-        })
-    );
-  } else {
-    // For static assets, use cache-first strategy
-    event.respondWith(
-      caches.match(request).then((response) => {
-        return response || fetch(request);
-      })
-    );
-  }
+      return fetch(event.request).then((networkResponse) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          // Cache new files for future use (except API calls)
+          if (!event.request.url.includes("/api/")) {
+            cache.put(event.request, networkResponse.clone());
+          }
+          return networkResponse;
+        });
+      });
+    })
+  );
 });

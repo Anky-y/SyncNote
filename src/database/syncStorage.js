@@ -7,13 +7,16 @@ import {
   getUnsyncedUpdatedNotes,
   deleteNoteFromUpdatedNotes,
   getUnsyncedDeletedNotes,
+  saveNoteLocally,
 } from "./noteStorage";
 import {
   getUnsyncedUsernameUpdates,
   deleteUnsyncedUsernameUpdate,
   getUnsyncedSyncUpdates,
   deleteUnsyncedSyncUpdate,
+  getLoggedInUser,
 } from "./userStorage";
+import db from "./localStorage";
 
 export async function syncNotes() {
   // Check if the user is online
@@ -40,6 +43,61 @@ export async function syncNotes() {
       await markNoteAsSynced(note.id); // Mark as synced in Dexie
     } else {
       console.log(`Failed to sync note with id ${note.id}`);
+    }
+  }
+}
+
+export async function syncOnlineNotes() {
+  // Check if the user is online
+  if (!navigator.onLine) {
+    console.log("You are offline. Syncing is postponed.");
+    return;
+  }
+
+  console.log("Syncing notes from server to local database...");
+
+  const user = await getLoggedInUser();
+
+  // Fetch updated notes from the server
+  const serverNotesResponse = await fetch(`${API_URL}/api/notes/${user.id}`);
+  if (!serverNotesResponse.ok) {
+    console.log("Failed to fetch updated notes from the server.");
+    return;
+  }
+
+  const serverNotes = await serverNotesResponse.json();
+
+  // Sync the server notes to the local Dexie.js database
+  for (const serverNote of serverNotes) {
+    const modifiedNote = {
+      bgColor: serverNote.bgColor,
+      content: serverNote.content,
+      title: serverNote.title,
+      updatedAt: serverNote.updatedAt,
+      userId: serverNote.userId,
+      synced: serverNote.synced,
+      id: serverNote._id,
+    };
+    console.log("modified note :");
+    console.log(modifiedNote);
+    const existingNote = await db.notes.get({ id: modifiedNote.id });
+    console.log(existingNote);
+
+    if (existingNote) {
+      // Compare timestamps to check if the server version is newer
+      console.log("found match");
+      if (new Date(modifiedNote.updatedAt) > new Date(existingNote.updatedAt)) {
+        // Update the existing note with the newer version from the server
+        await db.notes.put(modifiedNote);
+        console.log(`Note with id ${modifiedNote.id} updated locally.`);
+      }
+    } else {
+      console.log("not ofund match, adding");
+
+      console.log(modifiedNote);
+      // If the note doesn't exist locally, add it as a new note
+      await db.notes.add(modifiedNote);
+      console.log(`New note with id ${modifiedNote.id} added locally.`);
     }
   }
 }
@@ -181,6 +239,7 @@ export async function syncAll() {
   console.log("Starting full sync...");
 
   await syncNotes();
+  await syncOnlineNotes();
   await syncUpdatedNotes();
   await syncDeletedNotes();
   await syncUsernameUpdate();

@@ -1,5 +1,6 @@
 import { getLoggedInUser } from "./userStorage";
 import db from "./localStorage";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export async function saveNoteLocally(note) {
   console.log(note);
@@ -46,6 +47,22 @@ export async function getAllNotes() {
     return [];
   }
 }
+// export async function getAllOnlineNotes() {
+//   try {
+//     const user = await getLoggedInUser();
+//     const response = await fetch(`${API_URL}/api/notes/${user.id}`);
+
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch notes from the server");
+//     }
+
+//     const notes = await response.json();
+//     return notes.sort((a, b) => b.updatedAt - a.updatedAt);
+//   } catch (error) {
+//     console.error("Error fetching notes:", error);
+//     return [];
+//   }
+// }
 
 export async function getUnsyncedNotes() {
   const user = await getLoggedInUser();
