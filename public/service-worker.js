@@ -1,4 +1,4 @@
-const CACHE_NAME = "syncnote-cache-v2"; // Updated version for cache refresh
+const CACHE_NAME = "syncnote-cache-v3"; // Updated version for cache refresh
 
 // Static files to cache (public assets only)
 const FILES_TO_CACHE = [
