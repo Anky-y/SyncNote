@@ -78,10 +78,8 @@ export async function syncOnlineNotes() {
       synced: serverNote.synced,
       id: serverNote._id,
     };
-    console.log("modified note :");
-    console.log(modifiedNote);
+
     const existingNote = await db.notes.get({ id: modifiedNote.id });
-    console.log(existingNote);
 
     if (existingNote) {
       // Compare timestamps to check if the server version is newer
