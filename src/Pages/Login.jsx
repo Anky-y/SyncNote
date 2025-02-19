@@ -9,9 +9,8 @@ function Login() {
   const navigate = useNavigate();
 
   onMount(async () => {
-    console.log("mounted");
     if (await checkAuth()) {
-      navigate("/Main");
+      navigate("/");
     }
   });
 
@@ -34,7 +33,7 @@ function Login() {
     if (res.ok) {
       await saveLoggedInUserLocally(data.user);
       localStorage.setItem("authToken", data.token); // Store token for offline use
-      navigate("/Main");
+      navigate("/");
     } else {
       console.error("Login failed:", data.message);
       alert("Login failed: " + (data.message || "Please try again"));

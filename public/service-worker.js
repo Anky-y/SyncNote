@@ -1,4 +1,4 @@
-const CACHE_NAME = "syncnote-cache-v1"; // Updated version for cache refresh
+const CACHE_NAME = "syncnote-cache-v2"; // Updated version for cache refresh
 
 // Static files to cache (public assets only)
 const FILES_TO_CACHE = [
@@ -54,19 +54,21 @@ self.addEventListener("activate", (event) => {
   console.log("[Service Worker] Activating...");
 
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log("[Service Worker] Removing old cache:", key);
-            return caches.delete(key);
-          }
-        })
-      );
-    })
-  );
+    caches
+      .keys()
+      .then(async (cacheNames) => {
+        console.log("[Service Worker] Existing caches:", cacheNames);
 
-  self.clients.claim(); // Take control of all open pages
+        const cachesToDelete = cacheNames.filter((key) => key !== CACHE_NAME);
+
+        console.log("[Service Worker] Caches to delete:", cachesToDelete);
+
+        await Promise.all(cachesToDelete.map((key) => caches.delete(key)));
+
+        console.log("[Service Worker] Old caches removed.");
+      })
+      .then(() => self.clients.claim()) // Take control of all pages
+  );
 });
 
 /**
@@ -74,7 +76,7 @@ self.addEventListener("activate", (event) => {
  */
 self.addEventListener("fetch", (event) => {
   // Bypass caching for API calls
-  if (event.request.url.includes("/api/")) {
+  if (event.request.url.includes("/api/" || event.request.method !== "GET")) {
     return;
   }
 

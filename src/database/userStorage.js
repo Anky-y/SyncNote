@@ -17,8 +17,6 @@ export async function getLoggedInUser() {
 
 export async function checkAuth() {
   const token = localStorage.getItem("authToken");
-  console.log(token);
-
   if (token) {
     // If offline, assume authentication is valid
     if (!navigator.onLine) {

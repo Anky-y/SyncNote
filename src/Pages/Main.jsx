@@ -20,7 +20,7 @@ function Main() {
 
   onMount(async () => {
     if (!(await checkAuth())) {
-      navigate("/");
+      navigate("/Login");
     }
     // check if syncing is enabled
     if (navigator.onLine) {

@@ -6,6 +6,11 @@ import { getLoggedInUser, checkAuth } from "../database/userStorage";
 import { saveNoteLocally } from "../database/noteStorage";
 
 function CreateNote(note) {
+  onMount(async () => {
+    if (!(await checkAuth())) {
+      navigate("/Login");
+    }
+  });
   const navigate = useNavigate();
   const [title, setTitle] = createSignal(note.title ? note.title : "");
   const [content, setContent] = createSignal(note.content ? note.content : "");
@@ -20,12 +25,6 @@ function CreateNote(note) {
     "bg-purple-200",
     "bg-pink-200",
   ];
-
-  onMount(async () => {
-    if (!(await checkAuth())) {
-      navigate("/");
-    }
-  });
 
   const handleSave = async () => {
     const user = await getLoggedInUser();
@@ -46,7 +45,7 @@ function CreateNote(note) {
     } else {
       console.log("Syncing notes is disabled or user is offline.");
     }
-    navigate("/Main");
+    navigate("/");
   };
 
   return (
@@ -58,7 +57,7 @@ function CreateNote(note) {
       <div class="flex justify-between items-center mb-4">
         {/* Back Button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           class="text-xl text-gray-700 hover:text-gray-900"
         >
           ← Back

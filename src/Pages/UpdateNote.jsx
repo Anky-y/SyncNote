@@ -9,7 +9,7 @@ import { getLoggedInUser, checkAuth } from "../database/userStorage";
 function CreateNote() {
   onMount(async () => {
     if (!(await checkAuth())) {
-      navigate("/");
+      navigate("/Login");
     }
   });
   const location = useLocation();
@@ -53,7 +53,7 @@ function CreateNote() {
     } else {
       console.log("Syncing note updates is disabled or user is offline.");
     }
-    navigate("/Main");
+    navigate("/");
   };
 
   return (
@@ -65,7 +65,7 @@ function CreateNote() {
       <div class="flex justify-between items-center mb-4">
         {/* Back Button */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/")}
           class="text-xl text-gray-700 hover:text-gray-900"
         >
           ← Back

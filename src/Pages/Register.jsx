@@ -13,7 +13,7 @@ function Register() {
 
   onMount(async () => {
     if (await checkAuth()) {
-      navigate("/Main");
+      navigate("/");
     }
   });
 
@@ -42,7 +42,7 @@ function Register() {
         await saveLoggedInUserLocally(data.user);
         localStorage.setItem("authToken", data.token); // Store token for offline use
 
-        navigate("/Main");
+        navigate("/");
       } else {
         console.error("Login failed:", data.message);
         alert("Login failed: " + (data.message || "Please try again"));

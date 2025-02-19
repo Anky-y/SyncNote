@@ -25,8 +25,6 @@ export async function syncNotes() {
     return;
   }
 
-  console.log("Syncing notes to MongoDB...");
-
   // Get all unsynced notes from Dexie.js
   const unsyncedNotes = await getUnsyncedNotes();
 
@@ -83,16 +81,13 @@ export async function syncOnlineNotes() {
 
     if (existingNote) {
       // Compare timestamps to check if the server version is newer
-      console.log("found match");
       if (new Date(modifiedNote.updatedAt) > new Date(existingNote.updatedAt)) {
         // Update the existing note with the newer version from the server
         await db.notes.put(modifiedNote);
         console.log(`Note with id ${modifiedNote.id} updated locally.`);
       }
     } else {
-      console.log("not ofund match, adding");
 
-      console.log(modifiedNote);
       // If the note doesn't exist locally, add it as a new note
       await db.notes.add(modifiedNote);
       console.log(`New note with id ${modifiedNote.id} added locally.`);
@@ -110,7 +105,6 @@ export async function syncUpdatedNotes() {
 
   // Get all unsynced notes (which includes updates)
   const unsyncedUpdates = await getUnsyncedUpdatedNotes();
-  console.log(unsyncedUpdates);
 
   const latestUpdates = {};
 
@@ -149,7 +143,6 @@ export async function syncDeletedNotes() {
   console.log(unsyncedDeletions);
 
   for (let note of unsyncedDeletions) {
-    console.log(note);
     deleteNoteFromDeletedNotes(note); // Just remove it locally
     console.log(`Note ${note.id} was never synced. Deleted locally.`);
     const res = await fetch(`${API_URL}/api/notes/${note.id}`, {
@@ -175,7 +168,6 @@ export async function syncUsernameUpdate() {
   // Get the latest unsynced username update for the logged-in user
   const unsyncedUsername = await getUnsyncedUsernameUpdates();
 
-  console.log(unsyncedUsername);
 
   if (!unsyncedUsername) {
     console.log("No unsynced username update found.");
@@ -207,8 +199,6 @@ export async function syncSyncStatus() {
     console.log("You are offline. Syncing sync status is postponed.");
     return;
   }
-
-  console.log("Syncing sync status to MongoDB...");
 
   const unsyncedSync = await getUnsyncedSyncUpdates();
 
