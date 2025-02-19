@@ -1,6 +1,6 @@
 import { createSignal, onMount } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import CheckSolid from "../assets/check-solid.svg";
+import CheckSolid from "/public/assets/check-solid.svg";
 import { syncNotes } from "../database/syncStorage";
 import { getLoggedInUser, checkAuth } from "../database/userStorage";
 import { saveNoteLocally } from "../database/noteStorage";

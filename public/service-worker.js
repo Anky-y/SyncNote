@@ -78,9 +78,11 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
+        console.log("[Service Worker] Serving from cache:", event.request.url);
         return cachedResponse;
       }
 
+      console.log("[Service Worker] Fetching from network:", event.request.url);
       return fetch(event.request).then((networkResponse) => {
         return caches.open(CACHE_NAME).then((cache) => {
           // Cache new files for future use (except API calls)

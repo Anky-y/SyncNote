@@ -1,4 +1,4 @@
-import UserIcon from "../assets/user-regular.svg";
+import UserIcon from "/public/assets/user-regular.svg";
 const API_URL = import.meta.env.VITE_API_URL;
 import { createSignal } from "solid-js";
 import { FiEdit, FiCheck, FiX } from "solid-icons/fi"; // SolidJS compatible icons

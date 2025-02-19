@@ -1,5 +1,5 @@
 import { Navigate } from "solid-app-router";
-import BinIcon from "../assets/trash-can-regular.svg";
+import BinIcon from "/public/assets/trash-can-regular.svg";
 import Modal from "./ConfirmationModal";
 import { createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
