@@ -18,18 +18,6 @@ const FILES_TO_CACHE = [
   "/App.module.css",
   "/index.js",
   "/App.js",
-
-  // Components
-  "/Components/confirmationModal.js",
-  "/Components/Navbar.js",
-  "/Components/Notecard.js",
-
-  // Pages
-  "/Pages/CreateNote.js",
-  "/Pages/Login.js",
-  "/Pages/Main.js",
-  "/Pages/Register.js",
-  "/Pages/UpdateNote.js",
 ];
 
 /**
