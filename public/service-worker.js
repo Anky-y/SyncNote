@@ -1,6 +1,6 @@
-const CACHE_NAME = "syncnote-cache-v1"; // Update version when making changes
+const CACHE_NAME = "syncnote-cache-v1"; // Updated version for cache refresh
 
-// List of files to cache
+// Static files to cache (public assets only)
 const FILES_TO_CACHE = [
   "/", // Main page
   "/index.html",
@@ -12,24 +12,35 @@ const FILES_TO_CACHE = [
   "/assets/check-solid.svg",
   "/assets/trash-can-regular.svg",
   "/assets/user-regular.svg",
-
-  // CSS & JS files
-  "/index.css",
-  "/App.module.css",
-  "/index.js",
-  "/App.js",
 ];
 
 /**
- * Install event - Cache all files
+ * Install event - Cache static assets
  */
 self.addEventListener("install", (event) => {
   console.log("[Service Worker] Installing...");
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("[Service Worker] Caching files...");
-      return cache.addAll(FILES_TO_CACHE);
+    caches.open(CACHE_NAME).then(async (cache) => {
+      console.log("[Service Worker] Caching static files...");
+      try {
+        await cache.addAll(FILES_TO_CACHE);
+
+        // Dynamically cache all hashed files in /assets/
+        const response = await fetch("/");
+        const htmlText = await response.text();
+        const assetFiles = [
+          ...htmlText.matchAll(/\/assets\/[a-zA-Z0-9-_.]+/g),
+        ].map((m) => m[0]);
+
+        console.log(
+          "[Service Worker] Caching dynamic asset files:",
+          assetFiles
+        );
+        await cache.addAll(assetFiles);
+      } catch (error) {
+        console.error("[Service Worker] Error caching files:", error);
+      }
     })
   );
 
@@ -62,6 +73,11 @@ self.addEventListener("activate", (event) => {
  * Fetch event - Serve from cache first, then update
  */
 self.addEventListener("fetch", (event) => {
+  // Bypass caching for API calls
+  if (event.request.url.includes("/api/")) {
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -70,15 +86,28 @@ self.addEventListener("fetch", (event) => {
       }
 
       console.log("[Service Worker] Fetching from network:", event.request.url);
-      return fetch(event.request).then((networkResponse) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          // Cache new files for future use (except API calls)
-          if (!event.request.url.includes("/api/")) {
-            cache.put(event.request, networkResponse.clone());
+      return fetch(event.request)
+        .then((networkResponse) => {
+          if (!networkResponse || !networkResponse.ok) {
+            console.error(
+              "[Service Worker] Failed network request:",
+              event.request.url
+            );
+            return networkResponse;
           }
-          return networkResponse;
+
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, networkResponse.clone());
+            return networkResponse;
+          });
+        })
+        .catch((error) => {
+          console.error(
+            "[Service Worker] Fetch failed:",
+            event.request.url,
+            error
+          );
         });
-      });
     })
   );
 });
