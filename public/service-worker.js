@@ -76,7 +76,11 @@ self.addEventListener("activate", (event) => {
  */
 self.addEventListener("fetch", (event) => {
   // Bypass caching for API calls
-  if (event.request.url.includes("/api/" || event.request.method !== "GET")) {
+  if (
+    event.request.url.includes("/api/") ||
+    event.request.method !== "GET" ||
+    requestURL.protocol === "chrome-extension:"
+  ) {
     return;
   }
 
