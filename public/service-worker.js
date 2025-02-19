@@ -6,13 +6,12 @@ const FILES_TO_CACHE = [
   "/index.html",
   "/manifest.json",
   "/service-worker.js", // Service worker itself
-  "/assets/icon-192x192.jpg",
+  "/assets/icon-192x192.png",
   "/assets/icon-512x512.png",
   "/assets/icon-regular.png",
   "/assets/check-solid.svg",
   "/assets/trash-can-regular.svg",
   "/assets/user-regular.svg",
-  "/assets/logo.svg",
 
   // CSS & JS files
   "/index.css",
