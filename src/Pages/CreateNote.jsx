@@ -46,7 +46,7 @@ function CreateNote(note) {
     } else {
       console.log("Syncing notes is disabled or user is offline.");
     }
-    navigate(-1);
+    navigate("/Main");
   };
 
   return (

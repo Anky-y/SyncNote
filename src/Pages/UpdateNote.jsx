@@ -53,7 +53,7 @@ function CreateNote() {
     } else {
       console.log("Syncing note updates is disabled or user is offline.");
     }
-    navigate(-1);
+    navigate("/Main");
   };
 
   return (
